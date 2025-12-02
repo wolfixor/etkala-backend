@@ -64,38 +64,6 @@ jobs:
           set -e
           cd /srv/etkala-backend
 
-          # Update docker-compose.yml
-          cat > docker-compose.yml << 'EOF'
-          services:
-            api:
-              image: ghcr.io/wolfixor/etkala-api:${API_TAG:-latest}
-              env_file: .env
-              ports:
-                - "8001:8000"
-              restart: unless-stopped
-
-            auth:
-              image: ghcr.io/wolfixor/etkala-auth:${AUTH_TAG:-latest}
-              env_file: .env
-              ports:
-                - "8002:8000"
-              restart: unless-stopped
-
-            product:
-              image: ghcr.io/wolfixor/etkala-product:${PRODUCT_TAG:-latest}
-              env_file: .env
-              ports:
-                - "8003:8000"
-              restart: unless-stopped
-
-            order:
-              image: ghcr.io/wolfixor/etkala-order:${ORDER_TAG:-latest}
-              env_file: .env
-              ports:
-                - "8004:8000"
-              restart: unless-stopped
-          EOF
-
           # Log into GHCR with proper authentication
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
 
@@ -109,8 +77,8 @@ jobs:
           export ORDER_TAG=${TAG}
 
           # Pull and deploy with exact tags
-          docker compose pull
-          docker compose up -d
+          sudo docker compose pull
+          sudo docker compose up -d
 
           # Optional: cleanup old images
-          docker image prune -f
+          sudo docker image prune -f
