@@ -29,25 +29,24 @@ jobs:
         username: ${{ secrets.GHCR_USERNAME }}
         password: ${{ secrets.GHCR_TOKEN }}
 
-    - name: Build and push API image
+    - name: Build and push images
       run: |
-        docker build -t $REGISTRY/wolfixor/etkala-api:${{ steps.set_tag.outputs.tag }} ./api
-        docker push $REGISTRY/wolfixor/etkala-api:${{ steps.set_tag.outputs.tag }}
-
-    - name: Build and push Auth image
-      run: |
-        docker build -t $REGISTRY/wolfixor/etkala-auth:${{ steps.set_tag.outputs.tag }} ./auth
-        docker push $REGISTRY/wolfixor/etkala-auth:${{ steps.set_tag.outputs.tag }}
-
-    - name: Build and push Product image
-      run: |
-        docker build -t $REGISTRY/wolfixor/etkala-product:${{ steps.set_tag.outputs.tag }} ./product
-        docker push $REGISTRY/wolfixor/etkala-product:${{ steps.set_tag.outputs.tag }}
-
-    - name: Build and push Order image
-      run: |
-        docker build -t $REGISTRY/wolfixor/etkala-order:${{ steps.set_tag.outputs.tag }} ./order
-        docker push $REGISTRY/wolfixor/etkala-order:${{ steps.set_tag.outputs.tag }}
+        TAG=${{ steps.set_tag.outputs.tag }}
+        echo "Building images with tag: ${TAG}"
+        
+        # Build and push all images
+        docker build -t $REGISTRY/wolfixor/etkala-api:${TAG} ./api
+        docker build -t $REGISTRY/wolfixor/etkala-auth:${TAG} ./auth
+        docker build -t $REGISTRY/wolfixor/etkala-product:${TAG} ./product
+        docker build -t $REGISTRY/wolfixor/etkala-order:${TAG} ./order
+        
+        # Push all images
+        docker push $REGISTRY/wolfixor/etkala-api:${TAG}
+        docker push $REGISTRY/wolfixor/etkala-auth:${TAG}
+        docker push $REGISTRY/wolfixor/etkala-product:${TAG}
+        docker push $REGISTRY/wolfixor/etkala-order:${TAG}
+        
+        echo "All images built and pushed successfully"
 
   deploy:
     needs: build-and-push
@@ -69,7 +68,7 @@ jobs:
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
 
           TAG=${{ needs.build-and-push.outputs.image-tag }}
-          echo "Using tag: ${TAG}"
+          echo "Deploying with tag: ${TAG}"
 
           # Set environment variables for exact tags
           export API_TAG=${TAG}
