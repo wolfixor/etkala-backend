@@ -64,7 +64,10 @@ jobs:
           set -e
           cd /srv/etkala-backend
 
-          # Log into GHCR from the server (use GitHub PAT or proper auth)
+          # Pull latest code including updated docker-compose.yml
+          git pull origin main
+
+          # Log into GHCR with proper authentication
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
 
           TAG=${{ needs.build-and-push.outputs.image-tag }}
