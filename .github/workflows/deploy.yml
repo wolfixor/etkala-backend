@@ -60,6 +60,7 @@ jobs:
         host: ${{ secrets.VPS2_HOST }}
         username: ${{ secrets.VPS2_USER }}
         key: ${{ secrets.VPS2_SSH_KEY }}
+        port: 8945
         script: |
           set -e
           cd /srv/etkala-backend
